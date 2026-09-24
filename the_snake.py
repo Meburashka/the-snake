@@ -42,7 +42,7 @@ clock = pygame.time.Clock()
 class GameObject:
     """Базовый класс всех игровых объектов."""
 
-    def __init__(self, position, body_color):
+    def __init__(self, position=None, body_color=None):
         """Инициализирует объект: задаёт позицию и цвет."""
         self.position = position
         self.body_color = body_color
@@ -55,7 +55,7 @@ class GameObject:
 class Apple(GameObject):
     """Класс яблока — цели для змейки."""
 
-    def __init__(self, position):
+    def __init__(self, position=None):
         """Инициализирует яблоко с фиксированным цветом APPLE_COLOR."""
         super().__init__(position, APPLE_COLOR)
 
@@ -84,7 +84,7 @@ class Apple(GameObject):
 class Snake(GameObject):
     """Класс змейки — управляемого игроком объекта."""
 
-    def __init__(self, position):
+    def __init__(self, position=None):
         """Инициализирует змейку.
 
         Атрибуты:
@@ -160,6 +160,13 @@ class Snake(GameObject):
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
             self.last = None
 
+    def reset(self):
+        """Сбрасывает змейку в начальное состояние."""
+        self.positions = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
+        self.direction = (0, -1)
+        self.length = 1
+        print('Змейка съела себя!')
+
 
 def handle_keys(game_object):
     """
@@ -179,23 +186,6 @@ def handle_keys(game_object):
                 game_object.next_direction = LEFT
             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
-
-
-def reset():
-    """
-    Сбрасывает состояние игры после столкновения змейки с собой.
-
-    Функция выводит сообщение о проигрыше, создаёт новую змейку в центре
-    игрового поля и генерирует новую позицию для яблока.
-
-    Returns:
-        tuple: Кортеж из двух объектов: (новая змейка, новое яблоко).
-    """
-    print("Змейка съела в себя!")
-    new_snake = Snake((GRID_WIDTH // 2, GRID_HEIGHT // 2))
-    new_apple = Apple((0, 0))
-    new_apple.randomize_position()
-    return new_snake, new_apple
 
 
 def main():
@@ -228,7 +218,7 @@ def main():
         head_position = snake.get_head_position()
 
         if head_position in snake.positions[1:]:
-            snake, apple = reset()
+            snake.reset()
 
         if head_position == apple.position:
             snake.length += 1
