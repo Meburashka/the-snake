@@ -27,7 +27,7 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки:
-SPEED = 20
+SPEED = 5
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -135,7 +135,7 @@ class Snake(GameObject):
 
     def draw(self):
         """
-        Отрисовывает змейку на экране, затирая след.
+        Отрисовывает змейку на экране.
         Переводит координаты сетки в пиксельные.
         Если self.last не равен None, закрашивает эту ячейку цветом фона
         BOARD_BACKGROUND_COLOR и сбрасывает self.last в None.
@@ -202,6 +202,7 @@ def main():
     
     while True:
         clock.tick(SPEED)
+        screen.fill(BOARD_BACKGROUND_COLOR)
         handle_keys(snake)
         snake.update_direction() 
         snake.move()
@@ -209,9 +210,9 @@ def main():
         head_position = snake.get_head_position()
         
         if head_position in snake.positions[1:]:
-            print("Змейка съела в себя! Игра окончена.")
-            pygame.quit()
-            raise SystemExit
+            print("Змейка съела в себя!")
+            snake = Snake((GRID_WIDTH // 2, GRID_HEIGHT // 2))
+            apple.randomize_position() 
         
         if head_position == apple.position:
             snake.length += 1
