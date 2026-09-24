@@ -178,7 +178,14 @@ def handle_keys(game_object):
                 game_object.next_direction = LEFT
             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
-                    
+
+def reset():
+    print("Змейка съела в себя!")
+    new_snake = Snake((GRID_WIDTH // 2, GRID_HEIGHT // 2))
+    new_apple = Apple((0, 0))
+    new_apple.randomize_position()
+    return new_snake, new_apple
+                        
                     
 def main():
     """Главный игровой цикл.
@@ -210,9 +217,7 @@ def main():
         head_position = snake.get_head_position()
         
         if head_position in snake.positions[1:]:
-            print("Змейка съела в себя!")
-            snake = Snake((GRID_WIDTH // 2, GRID_HEIGHT // 2))
-            apple.randomize_position() 
+            snake, apple = reset()
         
         if head_position == apple.position:
             snake.length += 1
