@@ -165,7 +165,6 @@ class Snake(GameObject):
         self.positions = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
         self.direction = (0, -1)
         self.length = 1
-        print('Змейка съела себя!')
 
 
 def handle_keys(game_object):
