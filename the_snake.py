@@ -46,11 +46,13 @@ class GameObject:
 
     def __init__(self, position: Optional[tuple[int, int]] = None, body_color: Optional[tuple[int, int, int]] = None):
         """Инициализирует объект: задаёт позицию и цвет."""
+        
         self.position = position
         self.body_color = body_color
 
     def draw(self) -> None:
         """Абстрактный метод отрисовки. Переопределяется в дочерних классах."""
+        
         raise NotImplementedError
 
 
@@ -59,16 +61,27 @@ class Apple(GameObject):
 
     def __init__(self, position: tuple[int, int] | None = None):
         """Инициализирует яблоко с фиксированным цветом APPLE_COLOR."""
+        
         if position is None:
-            position = self.randomize_position()
+            position = (0, 0)
         super().__init__(position, APPLE_COLOR)
 
-    def randomize_position(self) -> tuple[int, int]:
-        """Задаёт яблоку случайную позицию на сетке и возвращает её."""
-        x = randint(0, GRID_WIDTH - 1)
-        y = randint(0, GRID_HEIGHT - 1)
-        self.position = (x, y)
-        return self.position
+    def randomize_position(self, occupied_positions: set[tuple[int, int]]) -> tuple[int, int]:
+        """
+        Задаёт яблоку случайную позицию на сетке, избегая занятых клеток.
+        
+        Args:
+            occupied_positions: Множество координат, которые нельзя занимать (тело змейки).
+        """
+        
+        while True:
+            x = randint(0, GRID_WIDTH - 1)
+            y = randint(0, GRID_HEIGHT - 1)
+            candidate = (x, y)
+            
+            if candidate not in occupied_positions:
+                self.position = candidate
+                return self.position
 
     def draw(self) -> None:
         """Отрисовывает яблоко на игровом поле.
@@ -110,6 +123,7 @@ class Snake(GameObject):
             last — координаты последнего сегмента перед его удалением;
             изначально None.
         """
+        
         if position is None:
             position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
         final_position: tuple[int, int] = position
@@ -123,6 +137,7 @@ class Snake(GameObject):
 
     def get_head_position(self) -> tuple[int, int]:
         """Возвращает позицию головы змейки."""
+        
         if not self.positions:
             return (0, 0)
         assert self.positions[0] is not None, "Голова змейки не может быть None!"
@@ -158,6 +173,7 @@ class Snake(GameObject):
 
     def update_direction(self) -> None:
         """Метод обновления направления после нажатия на кнопку."""
+        
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
@@ -193,6 +209,7 @@ class Snake(GameObject):
 
     def reset(self) -> None:
         """Сбрасывает змейку в начальное состояние."""
+        
         self.positions = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
         self.direction = (0, -1)
         self.length = 1
@@ -203,6 +220,7 @@ def handle_keys(game_object: Snake) -> None:
     Функция обработки действий пользователя.
     Обрабатывает события клавиатуры: меняет направление змейки.
     """
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -233,10 +251,11 @@ def main() -> None:
 
     Цикл повторяется с частотой SPEED кадров в секунду.
     """
+    
     pygame.init()
     snake = Snake((GRID_WIDTH // 2, GRID_HEIGHT // 2))
-    apple = Apple((0, 0))
-    apple.randomize_position()
+    apple = Apple()
+    apple.randomize_position(set(snake.positions))
 
     while True:
         clock.tick(SPEED)
@@ -252,7 +271,7 @@ def main() -> None:
 
         if head_position == apple.position:
             snake.length += 1
-            apple.randomize_position()
+            apple.randomize_position(set(snake.positions))
 
         snake.draw()
         apple.draw()
