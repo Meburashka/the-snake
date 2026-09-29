@@ -1,5 +1,7 @@
 from random import randint
 
+from typing import Optional
+
 import pygame
 
 # Константы для размеров поля и сетки:
@@ -42,12 +44,12 @@ clock = pygame.time.Clock()
 class GameObject:
     """Базовый класс всех игровых объектов."""
 
-    def __init__(self, position=None, body_color=None):
+    def __init__(self, position: Optional[tuple[int, int]] = None, body_color: Optional[tuple[int, int, int]] = None):
         """Инициализирует объект: задаёт позицию и цвет."""
         self.position = position
         self.body_color = body_color
 
-    def draw(self):
+    def draw(self) -> None:
         """Абстрактный метод отрисовки. Переопределяется в дочерних классах."""
         pass
 
@@ -55,22 +57,29 @@ class GameObject:
 class Apple(GameObject):
     """Класс яблока — цели для змейки."""
 
-    def __init__(self, position=None):
+    def __init__(self, position: tuple[int, int] | None = None):
         """Инициализирует яблоко с фиксированным цветом APPLE_COLOR."""
+        if position is None:
+            position = self.randomize_position()
         super().__init__(position, APPLE_COLOR)
 
-    def randomize_position(self):
+    def randomize_position(self) -> tuple[int, int]:
         """Задаёт яблоку случайную позицию на сетке и возвращает её."""
         x = randint(0, GRID_WIDTH - 1)
         y = randint(0, GRID_HEIGHT - 1)
         self.position = (x, y)
         return self.position
 
-    def draw(self):
+    def draw(self) -> None:
         """Отрисовывает яблоко на игровом поле.
         Преобразует координаты сетки в пиксельные и рисует ячейку
         цветом APPLE_COLOR с рамкой BORDER_COLOR.
         """
+        
+        assert self.body_color is not None, "У яблока должен быть цвет!"
+        if self.position is None:
+            return 
+        
         x, y = self.position
         pixel_x = x * GRID_SIZE
         pixel_y = y * GRID_SIZE
@@ -83,8 +92,11 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """Класс змейки — управляемого игроком объекта."""
-
-    def __init__(self, position=None):
+    
+    positions: list[tuple[int, int]]
+    last: tuple[int, int] | None
+    next_direction: tuple[int, int] | None
+    def __init__(self, position: tuple[int, int] | None = None):
         """Инициализирует змейку.
 
         Атрибуты:
@@ -98,18 +110,26 @@ class Snake(GameObject):
             last — координаты последнего сегмента перед его удалением;
             изначально None.
         """
-        super().__init__(position, SNAKE_COLOR)
-        self.positions = [position]
+        if position is None:
+            position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
+        final_position: tuple[int, int] = position
+        
+        super().__init__(final_position, SNAKE_COLOR)
+        self.positions = [final_position]
         self.length = 1
         self.direction = RIGHT
         self.next_direction = None
-        self.last = None
+        self.last = None 
 
-    def get_head_position(self):
+    def get_head_position(self) -> tuple[int, int]:
         """Возвращает позицию головы змейки."""
+        if not self.positions:
+            return (0, 0)
+        assert self.positions[0] is not None, "Голова змейки не может быть None!"
+
         return self.positions[0]
 
-    def move(self):
+    def move(self) -> None:
         """Обновляет положение змейки на игровом поле.
 
         Рассчитывает новую позицию головы с учётом направления и
@@ -117,6 +137,12 @@ class Snake(GameObject):
         positions и удаляет последний сегмент, если длина змейки
         не увеличилась (сохраняя удалённый сегмент в self.last).
         """
+        
+        assert self.body_color is not None, "У змейки должен быть цвет!"
+        if not self.positions:
+            return
+        assert self.positions[0] is not None, "Голова змейки не может быть None!"
+
         head_x, head_y = self.positions[0]
         dx, dy = self.direction
         new_head = ((head_x + dx) % GRID_WIDTH, (head_y + dy) % GRID_HEIGHT)
@@ -124,30 +150,36 @@ class Snake(GameObject):
         self.positions.insert(0, new_head)
 
         if len(self.positions) > self.length:
+            assert self.positions[-1] is not None, "Последний сегмент не может быть None!"
             self.last = self.positions[-1]
             self.positions.pop()
         else:
             self.last = None
 
-    def update_direction(self):
+    def update_direction(self) -> None:
         """Метод обновления направления после нажатия на кнопку."""
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
 
-    def draw(self):
+    def draw(self) -> None:
         """
         Отрисовывает змейку на экране.
         Переводит координаты сетки в пиксельные.
         Если self.last не равен None, закрашивает эту ячейку цветом фона
         BOARD_BACKGROUND_COLOR и сбрасывает self.last в None.
         """
-        for position in self.positions:
-            x, y = position
+        
+        assert self.body_color is not None, "У змейки должен быть цвет!"
+        if self.position is None:
+            return
+
+        for pos in self.positions: 
+            x, y = pos
             pixel_x = x * GRID_SIZE
             pixel_y = y * GRID_SIZE
-            position_new = (pixel_x, pixel_y)
-            rect = pygame.Rect(position_new, (GRID_SIZE, GRID_SIZE))
+            rect = pygame.Rect((pixel_x, pixel_y), (GRID_SIZE, GRID_SIZE))
+            
             pygame.draw.rect(screen, self.body_color, rect)
             pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
@@ -155,19 +187,18 @@ class Snake(GameObject):
             x, y = self.last
             pixel_x = x * GRID_SIZE
             pixel_y = y * GRID_SIZE
-            topleft = (pixel_x, pixel_y)
-            last_rect = pygame.Rect(topleft, (GRID_SIZE, GRID_SIZE))
+            last_rect = pygame.Rect((pixel_x, pixel_y), (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
             self.last = None
 
-    def reset(self):
+    def reset(self) -> None:
         """Сбрасывает змейку в начальное состояние."""
         self.positions = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
         self.direction = (0, -1)
         self.length = 1
 
 
-def handle_keys(game_object):
+def handle_keys(game_object: Snake) -> None:
     """
     Функция обработки действий пользователя.
     Обрабатывает события клавиатуры: меняет направление змейки.
@@ -187,7 +218,7 @@ def handle_keys(game_object):
                 game_object.next_direction = RIGHT
 
 
-def main():
+def main() -> None:
     """Главный игровой цикл.
 
     Создаёт змейку в центре поля и яблоко со случайной позицией.
