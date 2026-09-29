@@ -133,9 +133,9 @@ class Snake(GameObject):
         """
         if position is None:
             position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
-        
+
         super().__init__(position, SNAKE_COLOR)
-        
+
         self.reset(position)
 
     def get_head_position(self) -> tuple[int, int]:
@@ -202,7 +202,7 @@ class Snake(GameObject):
         """Сбрасывает змейку в начальное состояние."""
         if start_position is None:
             start_position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
-        
+
         # Теперь используем start_position, а не хардкод центра
         self.positions = [start_position]
         self.length = 1
