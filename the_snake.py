@@ -133,14 +133,10 @@ class Snake(GameObject):
         """
         if position is None:
             position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
-        final_position: tuple[int, int] = position
-
-        super().__init__(final_position, SNAKE_COLOR)
-        self.positions = [final_position]
-        self.length = 1
-        self.direction = RIGHT
-        self.next_direction = None
-        self.last = None
+        
+        super().__init__(position, SNAKE_COLOR)
+        
+        self.reset(position)
 
     def get_head_position(self) -> tuple[int, int]:
         """Возвращает позицию головы змейки."""
@@ -157,7 +153,6 @@ class Snake(GameObject):
         positions и удаляет последний сегмент, если длина змейки
         не увеличилась (сохраняя удалённый сегмент в self.last).
         """
-        assert self.body_color is not None, "У змейки должен быть цвет!"
         if not self.positions:
             return
 
@@ -203,11 +198,17 @@ class Snake(GameObject):
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
             self.last = None
 
-    def reset(self) -> None:
+    def reset(self, start_position: tuple[int, int] | None = None) -> None:
         """Сбрасывает змейку в начальное состояние."""
-        self.positions = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
-        self.direction = (0, -1)
+        if start_position is None:
+            start_position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
+        
+        # Теперь используем start_position, а не хардкод центра
+        self.positions = [start_position]
         self.length = 1
+        self.direction = (0, -1)  # Старт смотрит вверх
+        self.next_direction = None
+        self.last = None
 
 
 def handle_keys(game_object: Snake) -> None:
