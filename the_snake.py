@@ -51,7 +51,7 @@ class GameObject:
 
     def draw(self) -> None:
         """Абстрактный метод отрисовки. Переопределяется в дочерних классах."""
-        pass
+        raise NotImplementedError
 
 
 class Apple(GameObject):
