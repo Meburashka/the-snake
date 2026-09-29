@@ -156,15 +156,15 @@ class Snake(GameObject):
         if not self.positions:
             return
 
-        head_x, head_y = self.positions[0]
+        head_position = self.get_head_position()
+        head_x, head_y = head_position
+
         dx, dy = self.direction
         new_head = ((head_x + dx) % GRID_WIDTH, (head_y + dy) % GRID_HEIGHT)
 
         self.positions.insert(0, new_head)
 
         if len(self.positions) > self.length:
-            assert self.positions[-1] is not None, (
-                "Последний сегмент не может быть None!")
             self.last = self.positions[-1]
             self.positions.pop()
         else:
