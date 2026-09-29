@@ -1,5 +1,4 @@
 from random import randint
-
 from typing import Optional
 
 import pygame
@@ -103,7 +102,7 @@ class Apple(GameObject):
         Преобразует координаты сетки в пиксельные и рисует ячейку
         цветом APPLE_COLOR с рамкой BORDER_COLOR.
         """
-        assert self.body_color is not None, "У яблока должен быть цвет!"
+        assert self.body_color is not None, 'У яблока должен быть цвет!'
         if self.position is None:
             return
 
@@ -183,7 +182,7 @@ class Snake(GameObject):
         Если self.last не равен None, закрашивает эту ячейку цветом фона
         BOARD_BACKGROUND_COLOR и сбрасывает self.last в None.
         """
-        assert self.body_color is not None, "У змейки должен быть цвет!"
+        assert self.body_color is not None, 'У змейки должен быть цвет!'
         if self.position is None:
             return
 
