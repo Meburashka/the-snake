@@ -39,8 +39,9 @@ pygame.display.set_caption('Змейка')
 # Настройка времени:
 clock = pygame.time.Clock()
 
+
 def draw_cell(position: tuple[int, int],
-                color: tuple[int, int, int]) -> None:
+              color: tuple[int, int, int]) -> None:
     """
     Статический метод для отрисовки одной клетки.
     Принимает позицию в сетке и цвет, рисует квадрат с рамкой.
@@ -53,6 +54,7 @@ def draw_cell(position: tuple[int, int],
     pygame.draw.rect(screen, color, rect)
     pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
+
 class GameObject:
     """Базовый класс всех игровых объектов."""
 
@@ -64,7 +66,8 @@ class GameObject:
 
     def draw(self) -> None:
         """Абстрактный метод отрисовки. Переопределяется в дочерних классах."""
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Метод draw должен быть реализован в дочерних классах")
 
 
 class Apple(GameObject):
