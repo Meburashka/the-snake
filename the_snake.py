@@ -39,6 +39,19 @@ pygame.display.set_caption('Змейка')
 # Настройка времени:
 clock = pygame.time.Clock()
 
+def draw_cell(position: tuple[int, int],
+                color: tuple[int, int, int]) -> None:
+    """
+    Статический метод для отрисовки одной клетки.
+    Принимает позицию в сетке и цвет, рисует квадрат с рамкой.
+    """
+    x, y = position
+    pixel_x = x * GRID_SIZE
+    pixel_y = y * GRID_SIZE
+    rect = pygame.Rect((pixel_x, pixel_y), (GRID_SIZE, GRID_SIZE))
+
+    pygame.draw.rect(screen, color, rect)
+    pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 class GameObject:
     """Базовый класс всех игровых объектов."""
@@ -48,21 +61,6 @@ class GameObject:
         """Инициализирует объект: задаёт позицию и цвет."""
         self.position = position
         self.body_color = body_color
-
-    @staticmethod
-    def draw_cell(position: tuple[int, int],
-                  color: tuple[int, int, int]) -> None:
-        """
-        Статический метод для отрисовки одной клетки.
-        Принимает позицию в сетке и цвет, рисует квадрат с рамкой.
-        """
-        x, y = position
-        pixel_x = x * GRID_SIZE
-        pixel_y = y * GRID_SIZE
-        rect = pygame.Rect((pixel_x, pixel_y), (GRID_SIZE, GRID_SIZE))
-
-        pygame.draw.rect(screen, color, rect)
-        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     def draw(self) -> None:
         """Абстрактный метод отрисовки. Переопределяется в дочерних классах."""
@@ -106,7 +104,7 @@ class Apple(GameObject):
         if self.position is None:
             return
 
-        GameObject.draw_cell(self.position, self.body_color)
+        draw_cell(self.position, self.body_color)
 
 
 class Snake(GameObject):
@@ -187,7 +185,7 @@ class Snake(GameObject):
             return
 
         for position in self.positions:
-            GameObject.draw_cell(position, self.body_color)
+            draw_cell(position, self.body_color)
 
         if self.last is not None:
             x, y = self.last
