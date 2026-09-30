@@ -44,7 +44,7 @@ class GameObject:
     """Базовый класс всех игровых объектов."""
 
     def __init__(self, position: Optional[tuple[int, int]] = None,
-                 body_color: Optional[tuple[int, int, int]] = None):
+                 body_color: Optional[tuple[int, int, int]] = None) -> None:
         """Инициализирует объект: задаёт позицию и цвет."""
         self.position = position
         self.body_color = body_color
@@ -72,7 +72,7 @@ class GameObject:
 class Apple(GameObject):
     """Класс яблока — цели для змейки."""
 
-    def __init__(self, position: tuple[int, int] | None = None):
+    def __init__(self, position: tuple[int, int] | None = None) -> None:
         """Инициализирует яблоко с фиксированным цветом APPLE_COLOR."""
         if position is None:
             position = (0, 0)
@@ -116,7 +116,7 @@ class Snake(GameObject):
     last: tuple[int, int] | None
     next_direction: tuple[int, int] | None
 
-    def __init__(self, position: tuple[int, int] | None = None):
+    def __init__(self, position: tuple[int, int] | None = None) -> None:
         """Инициализирует змейку.
 
         Атрибуты:
