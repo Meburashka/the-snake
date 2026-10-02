@@ -60,13 +60,15 @@ class GameObject:
         Статический метод для отрисовки одной клетки.
         Принимает позицию в сетке и цвет, рисует квадрат с рамкой.
         """
+        if color is None or position is None:
+            return
+
         x, y = position
         pixel_x = x * GRID_SIZE
         pixel_y = y * GRID_SIZE
         rect = pygame.Rect((pixel_x, pixel_y), (GRID_SIZE, GRID_SIZE))
 
         pygame.draw.rect(screen, color, rect)
-        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Apple(GameObject):
@@ -102,10 +104,6 @@ class Apple(GameObject):
         Преобразует координаты сетки в пиксельные и рисует ячейку
         цветом APPLE_COLOR с рамкой BORDER_COLOR.
         """
-        assert self.body_color is not None, 'У яблока должен быть цвет!'
-        if self.position is None:
-            return
-
         self.draw_cell(self.position, self.body_color)
 
 
@@ -183,18 +181,12 @@ class Snake(GameObject):
         BOARD_BACKGROUND_COLOR и сбрасывает self.last в None.
         """
         assert self.body_color is not None, 'У змейки должен быть цвет!'
-        if self.position is None:
-            return
 
         for position in self.positions:
             self.draw_cell(position, self.body_color)
 
         if self.last is not None:
-            x, y = self.last
-            pixel_x = x * GRID_SIZE
-            pixel_y = y * GRID_SIZE
-            last_rect = pygame.Rect((pixel_x, pixel_y), (GRID_SIZE, GRID_SIZE))
-            pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
+            self.draw_cell(self.last, BOARD_BACKGROUND_COLOR)
             self.last = None
 
     def reset(self, start_position: tuple[int, int] | None = None) -> None:
